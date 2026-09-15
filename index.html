@@ -1,0 +1,2212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Income Calculation Tool</title>
+<meta name="description" content="Income calculation tools for LIHTC properties: Social Security, Pay Stubs, and Employment Verification." />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2040%2040%27%3E%3Crect%20x%3D%277%27%20y%3D%273%27%20width%3D%2726%27%20height%3D%2734%27%20rx%3D%274%27%20fill%3D%27%230f2f4c%27/%3E%3Crect%20x%3D%2710.5%27%20y%3D%276.5%27%20width%3D%2719%27%20height%3D%277%27%20rx%3D%271.2%27%20fill%3D%27%23ffffff%27/%3E%3Crect%20x%3D%2710.5%27%20y%3D%2717.0%27%20width%3D%274%27%20height%3D%273.4%27%20rx%3D%270.8%27%20fill%3D%27%23ffffff%27/%3E%3Crect%20x%3D%2716.3%27%20y%3D%2717.0%27%20width%3D%274%27%20height%3D%273.4%27%20rx%3D%270.8%27%20fill%3D%27%23ffffff%27/%3E%3Crect%20x%3D%2722.1%27%20y%3D%2717.0%27%20width%3D%274%27%20height%3D%273.4%27%20rx%3D%270.8%27%20fill%3D%27%23ffffff%27/%3E%3Crect%20x%3D%2710.5%27%20y%3D%2722.0%27%20width%3D%274%27%20height%3D%273.4%27%20rx%3D%270.8%27%20fill%3D%27%23ffffff%27/%3E%3Crect%20x%3D%2716.3%27%20y%3D%2722.0%27%20width%3D%274%27%20height%3D%273.4%27%20rx%3D%270.8%27%20fill%3D%27%23ffffff%27/%3E%3Crect%20x%3D%2722.1%27%20y%3D%2722.0%27%20width%3D%274%27%20height%3D%273.4%27%20rx%3D%270.8%27%20fill%3D%27%23ffffff%27/%3E%3Crect%20x%3D%2710.5%27%20y%3D%2727.0%27%20width%3D%274%27%20height%3D%273.4%27%20rx%3D%270.8%27%20fill%3D%27%23ffffff%27/%3E%3Crect%20x%3D%2716.3%27%20y%3D%2727.0%27%20width%3D%274%27%20height%3D%273.4%27%20rx%3D%270.8%27%20fill%3D%27%23ffffff%27/%3E%3Crect%20x%3D%2722.1%27%20y%3D%2727.0%27%20width%3D%274%27%20height%3D%273.4%27%20rx%3D%270.8%27%20fill%3D%27%23ffffff%27/%3E%3Crect%20x%3D%2710.5%27%20y%3D%2732.0%27%20width%3D%274%27%20height%3D%273.4%27%20rx%3D%270.8%27%20fill%3D%27%23ffffff%27/%3E%3Crect%20x%3D%2716.3%27%20y%3D%2732.0%27%20width%3D%274%27%20height%3D%273.4%27%20rx%3D%270.8%27%20fill%3D%27%23ffffff%27/%3E%3Crect%20x%3D%2722.1%27%20y%3D%2732.0%27%20width%3D%274%27%20height%3D%273.4%27%20rx%3D%270.8%27%20fill%3D%27%23ffffff%27/%3E%3C/svg%3E" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js" crossorigin></script>
+
+<style>
+  :root {
+    --navy: #0f2f4c;
+    --navy-light: #1c4a72;
+    --teal: #0d8a8a;
+    --teal-light: #e6f5f5;
+    --bg: #f4f6f8;
+    --card: #ffffff;
+    --border: #dbe2e8;
+    --text: #1f2937;
+    --text-muted: #6b7280;
+    --warn-bg: #fff4e5;
+    --warn-border: #f0b429;
+    --warn-text: #7a4a00;
+    --danger: #c0392b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  header.site-header {
+    background: #ffffff;
+    color: var(--navy);
+    padding: 20px 24px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 10px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .brand svg { display: block; height: 48px; width: auto; }
+  .brand img { display: block; height: 48px; width: auto; }
+  .brand-divider {
+    width: 1px;
+    height: 36px;
+    background: var(--border);
+  }
+  header.site-header h1 {
+    margin: 0 0 4px 0;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    color: var(--navy);
+  }
+  header.site-header p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  .print-only { display: none; }
+  .history-toggle-btn, .help-toggle-btn {
+    padding: 8px 14px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .history-panel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 47, 76, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 1000;
+  }
+  .modal-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 24px 26px;
+    max-width: 560px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 12px 40px rgba(15, 47, 76, 0.3);
+  }
+  .onboarding-steps {
+    margin: 0 0 12px 0;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .onboarding-steps li {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .onboarding-steps strong { color: var(--navy); }
+  .tour-root { position: fixed; inset: 0; z-index: 1100; }
+  .tour-dim {
+    position: fixed;
+    background: rgba(15, 47, 76, 0.6);
+    transition: all 0.2s ease;
+  }
+  .tour-ring {
+    position: fixed;
+    border: 2px solid var(--teal);
+    border-radius: 8px;
+    box-shadow: 0 0 0 3px rgba(13, 138, 138, 0.35);
+    transition: all 0.2s ease;
+    pointer-events: none;
+  }
+  .tour-tooltip {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 16px 18px;
+    box-shadow: 0 12px 32px rgba(15, 47, 76, 0.35);
+    transition: top 0.2s ease, left 0.2s ease;
+  }
+  .tour-progress {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 6px;
+  }
+  .tour-tooltip h3 {
+    margin: 0 0 6px 0;
+    font-size: 15px;
+    color: var(--navy);
+  }
+  .tour-tooltip p {
+    margin: 0 0 14px 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .tour-tooltip-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 24px 16px 64px;
+  }
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--border);
+  }
+  .tab-btn {
+    appearance: none;
+    border: none;
+    background: transparent;
+    padding: 12px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .tab-btn:hover { color: var(--navy); }
+  .tab-btn.active {
+    color: var(--navy);
+    border-bottom-color: var(--teal);
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  }
+  .card h2 {
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--navy-light);
+    margin: 0 0 16px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .card p.hint {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: -8px 0 16px 0;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px 16px;
+  }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .field .req { color: var(--danger); }
+  .field input, .field select {
+    padding: 9px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 14px;
+    background: #fff;
+    color: var(--text);
+    width: 100%;
+  }
+  .field input:focus, .field select:focus {
+    outline: none;
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px var(--teal-light);
+  }
+  .field .subhint { font-size: 11.5px; color: var(--text-muted); }
+  .radio-row { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; }
+  .radio-row label { display: flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 500; }
+  .warning {
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-border);
+    color: var(--warn-text);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    margin: 6px 0 16px 0;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .warning strong { white-space: nowrap; }
+  .totals-box {
+    background: var(--teal-light);
+    border: 1px solid #bfe4e4;
+    border-radius: 8px;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4px;
+  }
+  .totals-box .label { font-size: 13px; font-weight: 600; color: var(--navy); }
+  .totals-box .value { font-size: 22px; font-weight: 700; color: var(--navy); }
+  .totals-box + .totals-box { margin-top: 10px; }
+  .breakdown-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 4px 0 16px 0;
+  }
+  .breakdown-box h3 {
+    margin: 0 0 10px 0;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--border);
+    font-size: 13.5px;
+  }
+  .breakdown-row:last-child { border-bottom: none; }
+  .breakdown-row .desc { color: var(--text-muted); }
+  .breakdown-row .amt { font-weight: 700; color: var(--text); }
+  .stub-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+  .table-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .stub-table th {
+    text-align: left;
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .stub-table td { padding: 6px 8px; }
+  .stub-table input { width: 100%; }
+  .actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  button.btn {
+    appearance: none;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--navy);
+    padding: 10px 18px;
+    border-radius: 7px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  button.btn:hover { background: #f0f4f7; }
+  button.btn.primary {
+    background: var(--teal);
+    border-color: var(--teal);
+    color: #fff;
+  }
+  button.btn.primary:hover { background: #0b7373; }
+  button.btn.danger { color: var(--danger); }
+  footer.site-footer {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 12px;
+    padding: 20px 16px 40px;
+  }
+  @media (max-width: 640px) {
+    /* Prevent iOS Safari from auto-zooming the page when an input gets focus. */
+    .field input, .field select { font-size: 16px; padding: 10px 10px; }
+
+    header.site-header { padding: 14px 14px 16px; }
+    .header-top { gap: 10px; flex-wrap: wrap; }
+    .brand svg, .brand img { height: 36px; }
+    .brand-divider { display: none; }
+    header.site-header h1 { font-size: 18px; }
+    header.site-header p.header-subtitle { font-size: 12.5px; }
+    .help-toggle-btn, .history-toggle-btn {
+      flex: 1 1 auto;
+      text-align: center;
+      margin-left: 0 !important;
+      padding: 9px 10px;
+      font-size: 12.5px;
+    }
+
+    .container { padding: 16px 12px 48px; }
+
+    /* Tabs scroll horizontally instead of wrapping/overflowing on narrow screens. */
+    .tabs {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      flex-wrap: nowrap;
+      gap: 2px;
+    }
+    .tab-btn { padding: 10px 12px; font-size: 13px; white-space: nowrap; flex: 0 0 auto; }
+
+    .card { padding: 14px 14px; margin-bottom: 14px; }
+    .card h2 { font-size: 13.5px; }
+
+    .grid { grid-template-columns: 1fr; gap: 12px; }
+
+    .radio-row { gap: 14px; }
+
+    /* Totals: stack label above the value so long labels never squeeze the number. */
+    .totals-box { flex-direction: column; align-items: flex-start; gap: 4px; }
+    .totals-box .value { font-size: 20px; }
+
+    /* Breakdown rows: stack description above amount instead of a cramped side-by-side row. */
+    .breakdown-row { flex-direction: column; align-items: flex-start; gap: 2px; }
+    .breakdown-row .amt { align-self: flex-end; }
+
+    .modal-overlay { padding: 12px; }
+    .modal-card { padding: 18px 16px; }
+
+    /* Full-width, stacked action buttons are easier to tap accurately on a phone. */
+    .actions { flex-direction: column; align-items: stretch; }
+    .actions button.btn { width: 100%; }
+
+    .stub-table th, .stub-table td { font-size: 12.5px; padding: 6px 6px; }
+  }
+
+  @media (max-width: 380px) {
+    header.site-header h1 { font-size: 16px; }
+    .totals-box .value { font-size: 18px; }
+  }
+
+  @media print {
+    .tabs, .actions, footer.site-footer { display: none !important; }
+    body { background: #fff; font-size: 11px; }
+    .container { padding: 0; max-width: 100%; }
+
+    /* Keep the logo + title header, but shrink it and drop the marketing subtitle */
+    header.site-header {
+      display: block !important;
+      padding: 6px 0 10px 0;
+      border-bottom: 1px solid #999;
+      margin-bottom: 10px;
+    }
+    header.site-header .header-top { margin-bottom: 2px; }
+    header.site-header .brand svg,
+    header.site-header .brand img { height: 30px; }
+    header.site-header h1 { font-size: 15px; }
+    header.site-header p.header-subtitle { display: none; }
+    header.site-header .history-toggle-btn,
+    header.site-header .help-toggle-btn { display: none !important; }
+    .history-panel { display: none !important; }
+    .modal-overlay, .tour-root { display: none !important; }
+    .print-only { display: block !important; }
+    .income-type-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--navy);
+      margin: 0;
+    }
+
+    /* YTD section: skip entirely when the toggle is set to No */
+    .ytd-no-print { display: none !important; }
+
+    /* Any collapsible section card: skip entirely when its Yes/No question is set to No */
+    .section-off-no-print { display: none !important; }
+
+    /* Elements that are only useful in the editing UI (buttons, add-more affordances) — always
+       skip these on the printed page regardless of any toggle state. */
+    .no-print { display: none !important; }
+
+    /* Squeeze every card as tight as possible so the whole form tries to fit one page */
+    .card {
+      box-shadow: none;
+      border: 1px solid #999;
+      break-inside: avoid;
+      page-break-inside: avoid;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      border-radius: 4px;
+    }
+    .card h2 {
+      font-size: 11px;
+      margin: 0 0 6px 0;
+      padding-bottom: 4px;
+    }
+    .card p.hint { margin: 4px 0 6px 0; font-size: 9.5px; }
+    .grid { gap: 5px 8px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+    .field { gap: 2px; }
+    .field label { font-size: 9.5px; }
+    .field .subhint { font-size: 8.5px; }
+    .field input, .field select {
+      padding: 3px 5px;
+      font-size: 10.5px;
+      border-radius: 3px;
+    }
+    .stub-table th, .stub-table td { padding: 3px 4px; font-size: 10px; }
+    .warning { padding: 5px 8px; font-size: 10px; margin: 4px 0 8px 0; }
+    .totals-box { padding: 6px 8px; margin-top: 2px; }
+    .totals-box .label { font-size: 10px; }
+    .totals-box .value { font-size: 13px; }
+    .totals-box + .totals-box { margin-top: 6px; }
+    .radio-row { gap: 10px; }
+    .radio-row label { font-size: 10.5px; }
+    .yes-no-toggle { margin-bottom: 4px; }
+    .breakdown-box { padding: 6px 8px; margin: 2px 0 8px 0; }
+    .breakdown-box h3 { font-size: 10px; margin: 0 0 4px 0; padding-bottom: 3px; }
+    .breakdown-row { padding: 3px 0; font-size: 9.5px; }
+
+    @page { margin: 0.5in; size: auto; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react">
+const { useState, useMemo, useRef, useEffect } = React;
+
+/* ---------------------------------------------------------
+   Shared helpers
+--------------------------------------------------------- */
+
+const money = (n) => {
+  if (n === null || n === undefined || isNaN(n)) return "$0.00";
+  return n.toLocaleString("en-US", { style: "currency", currency: "USD" });
+};
+
+const num = (v) => {
+  const n = parseFloat(v);
+  return isNaN(n) ? 0 : n;
+};
+
+// Round to the nearest cent, cleaning up binary floating-point drift first (e.g. a raw
+// division/multiplication landing at 259.04000000000004 instead of exactly 259.04) so every
+// dollar figure computed in the app — not just what's displayed — is a clean 2-decimal number
+// before it feeds into any further math.
+const round2 = (n) => {
+  if (n === null || n === undefined || isNaN(n)) return 0;
+  return Math.round(Number(n.toFixed(10)) * 100) / 100;
+};
+
+const daysBetween = (dateA, dateB) => {
+  if (!dateA || !dateB) return null;
+  const a = new Date(dateA + "T00:00:00");
+  const b = new Date(dateB + "T00:00:00");
+  if (isNaN(a) || isNaN(b)) return null;
+  return Math.round((b - a) / (1000 * 60 * 60 * 24));
+};
+
+// true if docDate is more than `threshold` days away from effectiveDate (either direction)
+const isStaleDoc = (docDate, effectiveDate, threshold = 120) => {
+  const diff = daysBetween(docDate, effectiveDate);
+  if (diff === null) return false;
+  return Math.abs(diff) > threshold;
+};
+
+// true if docDate is more than `threshold` days *before* effectiveDate
+const isStaleBefore = (docDate, effectiveDate, threshold = 120) => {
+  const diff = daysBetween(docDate, effectiveDate); // effective - doc
+  if (diff === null) return false;
+  return diff > threshold;
+};
+
+// Whole calendar months between two dates (end - start), ignoring day-of-month.
+const monthsBetween = (start, end) => {
+  if (!start || !end) return null;
+  const s = new Date(start + "T00:00:00");
+  const e = new Date(end + "T00:00:00");
+  if (isNaN(s) || isNaN(e)) return null;
+  return (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth());
+};
+
+const PAY_BASIS_MULTIPLIER = {
+  Weekly: 52,
+  "Bi-Weekly": 26,
+  "Semi-Monthly": 24,
+  Monthly: 12,
+  Yearly: 1,
+};
+
+// Annualize a wage/amount given a pay basis. Hourly needs hours/week.
+const annualize = (amount, payBasis, hoursPerWeek) => {
+  const amt = num(amount);
+  if (payBasis === "Hourly") return round2(amt * num(hoursPerWeek) * 52);
+  const mult = PAY_BASIS_MULTIPLIER[payBasis] || 0;
+  return round2(amt * mult);
+};
+
+const todayISO = () => new Date().toISOString().slice(0, 10);
+
+const jan1ThisYear = () => `${new Date().getFullYear()}-01-01`;
+
+// Pay periods worked between start-of-year (or a later employment date) and the last pay stub date.
+const calcPeriodsWorked = (start, end, freqNum) => {
+  if (!end || !freqNum) return null;
+  const endDate = new Date(end + "T00:00:00");
+  let startDate = new Date(endDate.getFullYear(), 0, 1); // default: Jan 1 of same year
+  if (start) {
+    const enteredStart = new Date(start + "T00:00:00");
+    if (enteredStart > startDate) startDate = enteredStart;
+  }
+  const diffDays = (endDate - startDate) / (1000 * 60 * 60 * 24);
+  let periods = 0;
+  if (freqNum === 52) periods = diffDays / 7;
+  else if (freqNum === 26) periods = diffDays / 14;
+  else if (freqNum === 24) periods = (diffDays / 365) * 24;
+  else if (freqNum === 12) periods = (diffDays / 365) * 12;
+  return periods > 0 ? Math.ceil(periods) : null;
+};
+
+// Average income per pay period, based on YTD gross and periods worked.
+const calcAvgPeriodIncome = (ytd, periodsWorked) => {
+  const periods = Math.round(num(periodsWorked));
+  if (num(ytd) && periods > 0) {
+    return Number((num(ytd) / periods).toFixed(2));
+  }
+  return null;
+};
+
+// Annualized YTD gross income.
+const calcYtdAnnual = (ytd, periodsWorked, freqNum) => {
+  const pw = num(periodsWorked);
+  if (num(ytd) && pw > 0 && freqNum) {
+    const avgPerPeriod = Number((num(ytd) / pw).toFixed(2));
+    return Number((avgPerPeriod * freqNum).toFixed(2));
+  }
+  return null;
+};
+
+/* ---------------------------------------------------------
+   Saved work (per-browser history, via localStorage)
+--------------------------------------------------------- */
+
+const HISTORY_KEY = "income_calc_history_v1";
+const HISTORY_LIMIT = 200;
+
+const loadHistory = () => {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    return [];
+  }
+};
+
+const writeHistory = (entries) => {
+  try {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(entries.slice(0, HISTORY_LIMIT)));
+  } catch (e) {
+    // localStorage unavailable or full — fail silently, saving is a convenience, not critical
+  }
+};
+
+// Snapshots the current form into this browser's saved-work history. Called whenever
+// Print / Download PDF is used, so every generated document has a matching saved copy.
+const saveCurrentAsHistory = (tabKey, tabLabel, state) => {
+  const entry = {
+    id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    tabKey,
+    tabLabel,
+    savedAt: new Date().toISOString(),
+    propertyName: state.propertyName || "",
+    memberName: state.name || "",
+    unit: state.unit || "",
+    certType: state.certType || "",
+    effectiveDate: state.effectiveDate || "",
+    data: state,
+  };
+  writeHistory([entry, ...loadHistory()]);
+  return entry;
+};
+
+const deleteHistoryEntry = (id) => {
+  const next = loadHistory().filter((e) => e.id !== id);
+  writeHistory(next);
+  return next;
+};
+
+/* ---------------------------------------------------------
+   First-time onboarding guide
+--------------------------------------------------------- */
+
+const ONBOARDING_KEY = "income_calc_onboarding_seen_v1";
+
+const hasSeenOnboarding = () => {
+  try {
+    return localStorage.getItem(ONBOARDING_KEY) === "1";
+  } catch (e) {
+    return true; // if storage is unavailable, don't force the modal every load
+  }
+};
+
+const markOnboardingSeen = () => {
+  try {
+    localStorage.setItem(ONBOARDING_KEY, "1");
+  } catch (e) {
+    // ignore
+  }
+};
+
+/* ---------------------------------------------------------
+   Share links (calculation data encoded directly in the URL hash —
+   never sent to any server, works with zero backend)
+--------------------------------------------------------- */
+
+const buildShareUrl = (tabKey, tabLabel, state) => {
+  try {
+    const json = JSON.stringify({ tabKey, tabLabel, data: state });
+    const encoded = btoa(unescape(encodeURIComponent(json)));
+    const base = window.location.origin + window.location.pathname;
+    return `${base}#share=${encoded}`;
+  } catch (e) {
+    return null;
+  }
+};
+
+const parseShareHash = () => {
+  try {
+    const hash = window.location.hash || "";
+    const match = hash.match(/#share=(.+)$/);
+    if (!match) return null;
+    const json = decodeURIComponent(escape(atob(match[1])));
+    const payload = JSON.parse(json);
+    if (!payload || !payload.tabKey || !payload.data) return null;
+    return payload;
+  } catch (e) {
+    return null;
+  }
+};
+
+/* ---------------------------------------------------------
+   Print / PDF filenames — built from the form's own fields so a saved PDF is
+   self-identifying: Property Name - Certification Type - Effective Date -
+   Unit # - Household Member Name - Income source Calculation
+--------------------------------------------------------- */
+
+// Strip characters that aren't safe in a filename on Windows/macOS.
+const sanitizeForFilename = (str) => (str || "").toString().trim().replace(/[\\/:*?"<>|]+/g, "").trim();
+
+const buildPrintFilename = (tabLabel, state) => {
+  const parts = [
+    state.propertyName,
+    state.certType,
+    state.effectiveDate,
+    state.unit,
+    state.name,
+    tabLabel,
+  ]
+    .map(sanitizeForFilename)
+    .filter(Boolean);
+  return parts.length ? parts.join(" - ") : "Income Calculation";
+};
+
+// Chrome/Edge/Safari's "Save as PDF" in the print dialog suggests document.title as the
+// filename, so swap the title in just before printing and restore it right after.
+const printAs = (filename) => {
+  const original = document.title;
+  document.title = filename || original;
+  window.print();
+  const restore = () => {
+    document.title = original;
+    window.removeEventListener("afterprint", restore);
+  };
+  window.addEventListener("afterprint", restore);
+  // Fallback for browsers that don't fire afterprint reliably (e.g. some mobile browsers).
+  setTimeout(restore, 3000);
+};
+
+/* ---------------------------------------------------------
+   Small shared UI atoms
+--------------------------------------------------------- */
+
+function Field({ label, required, children, hint }) {
+  return (
+    <div className="field">
+      <label>{label} {required && <span className="req">*</span>}</label>
+      {children}
+      {hint && <span className="subhint">{hint}</span>}
+    </div>
+  );
+}
+
+function TextInput({ value, onChange, type = "text", placeholder, step }) {
+  return (
+    <input
+      type={type}
+      value={value}
+      step={step}
+      placeholder={placeholder}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  );
+}
+
+function Select({ value, onChange, options }) {
+  // options can be plain strings, or { value, label } objects for a custom display label.
+  return (
+    <select value={value} onChange={(e) => onChange(e.target.value)}>
+      {options.map((o) => {
+        const optValue = typeof o === "object" ? o.value : o;
+        const optLabel = typeof o === "object" ? o.label : o;
+        return (
+          <option key={optValue} value={optValue}>{optLabel}</option>
+        );
+      })}
+    </select>
+  );
+}
+
+function Warning({ children }) {
+  return (
+    <div className="warning">
+      <strong>⚠ Warning:</strong>
+      <span>{children}</span>
+    </div>
+  );
+}
+
+// A Yes/No question that drives whether a card's fields are shown ("open") or hidden ("closed").
+function YesNoToggle({ label, value, onChange }) {
+  return (
+    <div className="field yes-no-toggle">
+      <label>{label}</label>
+      <div className="radio-row">
+        <label><input type="radio" checked={value === "Yes"} onChange={() => onChange("Yes")} /> Yes</label>
+        <label><input type="radio" checked={value === "No"} onChange={() => onChange("No")} /> No</label>
+      </div>
+    </div>
+  );
+}
+
+const LOGO_URL = "https://static.wixstatic.com/media/fe2cfb_57a5d33a1a81450ba00d6ef1ea887b4f~mv2.png";
+
+function Logo() {
+  const [imgFailed, setImgFailed] = useState(false);
+
+  if (imgFailed) {
+    // Fallback: approximate recreation of the wordmark (icon + "paths") if the hosted logo can't load.
+    return (
+      <span className="brand">
+        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path
+            d="M6 24 C6 15 12 9 20 9"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="6"
+            strokeLinecap="round"
+          />
+          <path
+            d="M20 9 L20 31"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="6"
+            strokeLinecap="round"
+          />
+        </svg>
+        <span style={{ fontSize: 30, fontWeight: 800, letterSpacing: "-0.5px", color: "var(--navy)" }}>paths</span>
+      </span>
+    );
+  }
+
+  return (
+    <span className="brand">
+      <img
+        src={LOGO_URL}
+        alt="paths"
+        onError={() => setImgFailed(true)}
+        style={{ height: 48, width: "auto", display: "block" }}
+      />
+    </span>
+  );
+}
+
+function TotalsBox({ label, value }) {
+  return (
+    <div className="totals-box" data-tour="totals">
+      <span className="label">{label}</span>
+      <span className="value">{money(value)}</span>
+    </div>
+  );
+}
+
+const CERT_TYPE_OPTIONS = [
+  { value: "", label: "Select..." },
+  { value: "AR", label: "AR — Annual Recertification" },
+  { value: "IR", label: "IR — Interim Recertification" },
+  { value: "MI", label: "MI — Move-In" },
+  { value: "IC", label: "IC — Initial Certification" },
+];
+
+function HeaderFields({ state, setState }) {
+  return (
+    <div className="card" data-tour="header-fields">
+      <h2>Household Member</h2>
+      <div className="grid">
+        <Field label="Property Name">
+          <TextInput value={state.propertyName} onChange={(v) => setState({ ...state, propertyName: v })} />
+        </Field>
+        <Field label="Household Member Name">
+          <TextInput value={state.name} onChange={(v) => setState({ ...state, name: v })} />
+        </Field>
+        <Field label="Unit #">
+          <TextInput value={state.unit} onChange={(v) => setState({ ...state, unit: v })} />
+        </Field>
+        <Field label="Certification Type">
+          <Select value={state.certType} onChange={(v) => setState({ ...state, certType: v })} options={CERT_TYPE_OPTIONS} />
+        </Field>
+        <Field label="Effective Date" required>
+          <TextInput type="date" value={state.effectiveDate} onChange={(v) => setState({ ...state, effectiveDate: v })} />
+        </Field>
+      </div>
+    </div>
+  );
+}
+
+function ActionBar({ onPrint, onReset, onShare }) {
+  const [shareStatus, setShareStatus] = useState("");
+
+  const handleShare = async () => {
+    const url = onShare();
+    if (!url) {
+      window.alert("Couldn't build a share link for this entry. Please try again.");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareStatus("copied");
+    } catch (e) {
+      window.prompt("Copy this link to share this calculation:", url);
+      setShareStatus("manual");
+    }
+    setTimeout(() => setShareStatus(""), 2500);
+  };
+
+  return (
+    <div className="actions" data-tour="actions">
+      <button className="btn danger" onClick={onReset}>Reset</button>
+      <button className="btn" onClick={handleShare}>
+        {shareStatus === "copied" ? "Link Copied!" : "Share"}
+      </button>
+      <button className="btn" onClick={onPrint}>Print</button>
+      <button className="btn primary" onClick={onPrint}>Download PDF</button>
+    </div>
+  );
+}
+
+function HistoryPanel({ onLoad, onClose }) {
+  const [entries, setEntries] = useState(() => loadHistory());
+
+  const handleDelete = (id) => {
+    setEntries(deleteHistoryEntry(id));
+  };
+
+  return (
+    <div className="card history-panel">
+      <div className="history-panel-head">
+        <h2 style={{ margin: 0, border: "none", padding: 0 }}>My Saved Work</h2>
+        <button className="btn" onClick={onClose}>Close</button>
+      </div>
+      <p className="hint">
+        A copy is saved automatically to this browser every time you use Print or Download PDF.
+        Saved work only appears here on this computer/browser — it isn't shared with other staff.
+      </p>
+      {entries.length === 0 ? (
+        <p className="hint">No saved entries yet.</p>
+      ) : (
+        <div className="table-scroll">
+          <table className="stub-table">
+            <thead>
+              <tr>
+                <th>Saved</th>
+                <th>Income Type</th>
+                <th>Member</th>
+                <th>Property / Unit</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {entries.map((e) => (
+                <tr key={e.id}>
+                  <td>{new Date(e.savedAt).toLocaleString()}</td>
+                  <td>{e.tabLabel}</td>
+                  <td>{e.memberName || "—"}</td>
+                  <td>{(e.propertyName || "—") + (e.unit ? " / Unit " + e.unit : "")}</td>
+                  <td>
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <button className="btn primary" onClick={() => onLoad(e)}>Load</button>
+                      <button className="btn danger" onClick={() => handleDelete(e.id)}>Delete</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const TOUR_STEPS = [
+  {
+    selector: '[data-tour="tabs"]',
+    title: "Pick a calculator",
+    body: "Start here — choose Social Security, Pay Stubs, or Employment Verification to match the document you're working from.",
+  },
+  {
+    selector: '[data-tour="header-fields"]',
+    title: "Household details",
+    body: "Property name, household member, unit #, certification type, and effective date go here. They apply to whichever tab is open.",
+  },
+  {
+    selector: '[data-tour="income-fields"]',
+    title: "Enter the income figures",
+    body: "Type in the numbers straight from the document. Watch for yellow warning boxes — they flag documents dated more than 120 days from the effective date.",
+  },
+  {
+    selector: '[data-tour="totals"]',
+    title: "Automatic totals",
+    body: "The annualized total updates live as you type. No manual math needed.",
+  },
+  {
+    selector: '[data-tour="actions"]',
+    title: "Print, save, or reset",
+    body: "Print or Download PDF also saves a copy of this entry to My Saved Work automatically. Reset clears the current form.",
+  },
+  {
+    selector: '[data-tour="saved-work"]',
+    title: "My Saved Work",
+    body: "Come back anytime and reopen a past entry from here. It only shows entries saved on this computer/browser.",
+  },
+  {
+    selector: '[data-tour="help-btn"]',
+    title: "Need this again?",
+    body: "Click here anytime to replay this tour from the start.",
+  },
+];
+
+function GuidedTour({ onClose }) {
+  const [stepIndex, setStepIndex] = useState(0);
+  const [rect, setRect] = useState(null);
+  const step = TOUR_STEPS[stepIndex];
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const measure = () => {
+      if (cancelled) return;
+      const el = document.querySelector(step.selector);
+      if (el) {
+        const r = el.getBoundingClientRect();
+        setRect({ top: r.top, left: r.left, width: r.width, height: r.height });
+      } else {
+        setRect(null);
+      }
+    };
+
+    const el = document.querySelector(step.selector);
+    if (el && el.scrollIntoView) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+    // Wait briefly for the smooth scroll to settle before measuring position.
+    const t = setTimeout(measure, 260);
+
+    window.addEventListener("resize", measure);
+    window.addEventListener("scroll", measure, true);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+      window.removeEventListener("resize", measure);
+      window.removeEventListener("scroll", measure, true);
+    };
+  }, [stepIndex]);
+
+  const isFirst = stepIndex === 0;
+  const isLast = stepIndex === TOUR_STEPS.length - 1;
+
+  const handleNext = () => {
+    if (isLast) onClose();
+    else setStepIndex((i) => i + 1);
+  };
+  const handleBack = () => setStepIndex((i) => Math.max(0, i - 1));
+
+  const pad = 8;
+  const vw = typeof window !== "undefined" ? window.innerWidth : 1024;
+  const vh = typeof window !== "undefined" ? window.innerHeight : 768;
+
+  // Tooltip position: prefer just below the target, flip above if there isn't room,
+  // and clamp horizontally (and its own max width) so it never renders off-screen,
+  // even on narrow phones (~320px wide).
+  const tooltipMaxWidth = Math.min(340, vw - pad * 2);
+  let tooltipStyle = { position: "fixed", maxWidth: tooltipMaxWidth };
+  if (rect) {
+    const spaceBelow = vh - (rect.top + rect.height);
+    const placeAbove = spaceBelow < 200 && rect.top > 200;
+    tooltipStyle.top = placeAbove ? Math.max(pad, rect.top - 12) : rect.top + rect.height + 12;
+    const maxLeft = Math.max(pad, vw - tooltipMaxWidth - pad);
+    tooltipStyle.left = Math.min(Math.max(pad, rect.left), maxLeft);
+    if (placeAbove) tooltipStyle.transform = "translateY(-100%)";
+  } else {
+    tooltipStyle.top = "50%";
+    tooltipStyle.left = "50%";
+    tooltipStyle.transform = "translate(-50%, -50%)";
+  }
+
+  return (
+    <div className="tour-root">
+      {rect ? (
+        <React.Fragment>
+          <div className="tour-dim" style={{ top: 0, left: 0, right: 0, height: Math.max(0, rect.top - pad) }} />
+          <div className="tour-dim" style={{ top: rect.top + rect.height + pad, left: 0, right: 0, bottom: 0 }} />
+          <div className="tour-dim" style={{ top: rect.top - pad, left: 0, width: Math.max(0, rect.left - pad), height: rect.height + pad * 2 }} />
+          <div className="tour-dim" style={{ top: rect.top - pad, left: rect.left + rect.width + pad, right: 0, height: rect.height + pad * 2 }} />
+          <div
+            className="tour-ring"
+            style={{ top: rect.top - pad, left: rect.left - pad, width: rect.width + pad * 2, height: rect.height + pad * 2 }}
+          />
+        </React.Fragment>
+      ) : (
+        <div className="tour-dim" style={{ top: 0, left: 0, right: 0, bottom: 0 }} />
+      )}
+
+      <div className="tour-tooltip" style={tooltipStyle}>
+        <div className="tour-progress">Step {stepIndex + 1} of {TOUR_STEPS.length}</div>
+        <h3>{step.title}</h3>
+        <p>{step.body}</p>
+        <div className="tour-tooltip-actions">
+          <button className="btn" onClick={onClose}>Skip tour</button>
+          <div style={{ display: "flex", gap: 8 }}>
+            {!isFirst && <button className="btn" onClick={handleBack}>Back</button>}
+            <button className="btn primary" onClick={handleNext}>{isLast ? "Finish" : "Next"}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------
+   1) Social Security Calculator
+--------------------------------------------------------- */
+
+const BENEFIT_TYPE_OPTIONS = [
+  "Social Security (SS)",
+  "Supplemental Security Income (SSI)",
+  "SSP (State Supplementary Payment)",
+];
+
+const makeBenefit = () => ({
+  incomeType: "Social Security (SS)",
+  letterDate: "", monthlyBenefit: "",
+  eivAvailable: "No", eivAmount: "",
+  colaEnabled: "No", colaDate: "", colaPct: "",
+});
+
+const emptySS = {
+  propertyName: "", name: "", unit: "", certType: "", effectiveDate: "",
+  benefits: [makeBenefit()],
+};
+
+// Pure calculation for a single benefit entry — no hooks here (this runs inside a .map,
+// so it has to be a plain function, not useMemo, to keep the Rules of Hooks intact when
+// the number of benefit rows changes between renders).
+function calcBenefitTotals(b, effectiveDate) {
+  const isSSP = b.incomeType === "SSP (State Supplementary Payment)";
+
+  const currentAnnual = round2(num(b.monthlyBenefit) * 12);
+  // COLA never applies to SSP, regardless of what's stored in state (e.g. leftover from
+  // switching Income Type after already turning COLA on).
+  const colaOn = !isSSP && b.colaEnabled === "Yes";
+  const colaFilled = colaOn && b.colaPct !== "" && !isNaN(num(b.colaPct)) && num(b.colaPct) !== 0;
+
+  const monthlyAfterCola = round2(num(b.monthlyBenefit) * (1 + num(b.colaPct) / 100));
+  const annualAfterCola = round2(monthlyAfterCola * 12);
+
+  // EIV grows by the same COLA % as the Award Letter amount.
+  const rawEivAnnual = round2(num(b.eivAmount) * 12);
+  const eivMonthlyAfterCola = round2(num(b.eivAmount) * (1 + num(b.colaPct) / 100));
+  const eivAnnualAfterCola = round2(eivMonthlyAfterCola * 12);
+
+  let monthsUntilCola = null;
+  if (colaFilled && effectiveDate && b.colaDate) {
+    const m = monthsBetween(effectiveDate, b.colaDate);
+    if (m !== null) monthsUntilCola = Math.min(12, Math.max(0, m));
+  }
+  const monthsBefore = monthsUntilCola !== null ? monthsUntilCola : 0;
+  const monthsAfter = monthsUntilCola !== null ? 12 - monthsUntilCola : 0;
+
+  const amountBefore = round2(num(b.monthlyBenefit) * monthsBefore);
+  const amountAfter = round2(monthlyAfterCola * monthsAfter);
+  const blendedTotal = round2(amountBefore + amountAfter);
+
+  const eivAmountBefore = round2(num(b.eivAmount) * monthsBefore);
+  const eivAmountAfter = round2(eivMonthlyAfterCola * monthsAfter);
+  const eivBlendedTotal = round2(eivAmountBefore + eivAmountAfter);
+
+  const totalAnnual = monthsUntilCola !== null ? blendedTotal : (colaFilled ? annualAfterCola : currentAnnual);
+
+  const eivOn = b.eivAvailable === "Yes";
+  // Same COLA blending logic applied to the EIV figure as the Award Letter figure.
+  const eivAnnual = monthsUntilCola !== null
+    ? eivBlendedTotal
+    : (colaFilled ? eivAnnualAfterCola : rawEivAnnual);
+
+  const stale = isStaleDoc(b.letterDate, effectiveDate);
+
+  return {
+    isSSP,
+    currentAnnual, colaOn, colaFilled, monthlyAfterCola, annualAfterCola,
+    monthsUntilCola, monthsBefore, monthsAfter, amountBefore, amountAfter,
+    eivAmountBefore, eivAmountAfter, eivMonthlyAfterCola, eivAnnualAfterCola,
+    totalAnnual, eivOn, eivAnnual, rawEivAnnual, stale,
+  };
+}
+
+function SocialSecurityCalc({ initialState }) {
+  const [s, setS] = useState(initialState || emptySS);
+  const benefits = s.benefits && s.benefits.length ? s.benefits : [makeBenefit()];
+
+  const updateBenefit = (i, patch) => {
+    setS({ ...s, benefits: benefits.map((b, idx) => (idx === i ? { ...b, ...patch } : b)) });
+  };
+  const addBenefit = () => setS({ ...s, benefits: [...benefits, makeBenefit()] });
+  const removeBenefit = (i) => setS({ ...s, benefits: benefits.filter((_, idx) => idx !== i) });
+
+  return (
+    <div>
+      <HeaderFields state={s} setState={setS} />
+
+      {benefits.map((b, i) => {
+        const calc = calcBenefitTotals(b, s.effectiveDate);
+        return (
+          <div className="card" key={i} data-tour={i === 0 ? "income-fields" : undefined}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
+              <h2 style={{ marginBottom: 0 }}>
+                {b.incomeType}{benefits.length > 1 ? ` — Benefit ${i + 1}` : ""}
+              </h2>
+              {benefits.length > 1 && (
+                <button className="btn danger no-print" onClick={() => removeBenefit(i)} style={{ flexShrink: 0 }}>
+                  Remove
+                </button>
+              )}
+            </div>
+            <div className="grid" style={{ marginTop: 12 }}>
+              <Field label="Income Type">
+                <Select
+                  value={b.incomeType}
+                  onChange={(v) => updateBenefit(i, { incomeType: v })}
+                  options={BENEFIT_TYPE_OPTIONS}
+                />
+              </Field>
+              <Field label="Award/Benefit Letter Date">
+                <TextInput type="date" value={b.letterDate} onChange={(v) => updateBenefit(i, { letterDate: v })} />
+              </Field>
+              <Field label="Current monthly benefit amount" hint="Before any deductions">
+                <TextInput type="number" step="0.01" value={b.monthlyBenefit} onChange={(v) => updateBenefit(i, { monthlyBenefit: v })} placeholder="0.00" />
+              </Field>
+              <Field label="Current annual benefit">
+                <TextInput value={money(calc.currentAnnual)} onChange={() => {}} />
+              </Field>
+            </div>
+            {calc.stale && (
+              <Warning>
+                This Award/Benefit Letter is dated more than 120 days from the Effective Date.
+                HUD recommends using documents dated within 120 days of the effective date for income verification.
+              </Warning>
+            )}
+
+            <div className={calc.eivOn ? "" : "section-off-no-print"}>
+              <YesNoToggle
+                label="EIV Report Available?"
+                value={b.eivAvailable}
+                onChange={(v) => updateBenefit(i, { eivAvailable: v })}
+              />
+              {calc.eivOn && (
+                <div className="grid">
+                  <Field label="EIV Monthly Amount" hint="From the EIV Income Report">
+                    <TextInput type="number" step="0.01" value={b.eivAmount} onChange={(v) => updateBenefit(i, { eivAmount: v })} placeholder="0.00" />
+                  </Field>
+                  <Field label="EIV Annual Amount" hint="EIV Monthly Amount × 12">
+                    <TextInput value={money(calc.rawEivAnnual)} onChange={() => {}} />
+                  </Field>
+                </div>
+              )}
+              {calc.eivOn && (
+                <p className="hint" style={{ marginTop: 10 }}>
+                  When EIV is available, HUD-50059 income is taken from EIV and LIHTC TIC income is
+                  taken from the Award/Benefit Letter — see the totals below.
+                </p>
+              )}
+            </div>
+
+            <div className={calc.colaOn ? "" : "section-off-no-print"}>
+              {calc.isSSP ? (
+                <p className="hint" style={{ marginTop: 10 }}>
+                  COLA does not apply to SSP — this amount stays fixed at the monthly figure entered above.
+                </p>
+              ) : (
+                <React.Fragment>
+                  <YesNoToggle
+                    label="Is a COLA adjustment known for next year?"
+                    value={b.colaEnabled}
+                    onChange={(v) => updateBenefit(i, { colaEnabled: v })}
+                  />
+                  {calc.colaOn && (
+                    <React.Fragment>
+                    <div className="grid">
+                      <Field label="COLA effective date">
+                        <TextInput type="date" value={b.colaDate} onChange={(v) => updateBenefit(i, { colaDate: v })} />
+                      </Field>
+                      <Field label="Enter COLA increase %">
+                        <TextInput type="number" step="0.01" value={b.colaPct} onChange={(v) => updateBenefit(i, { colaPct: v })} placeholder="0.0" />
+                      </Field>
+                      <Field label="Award Letter — monthly benefit before COLA">
+                        <TextInput value={money(num(b.monthlyBenefit))} onChange={() => {}} />
+                      </Field>
+                      <Field label="Award Letter — monthly benefit after COLA">
+                        <TextInput value={money(calc.monthlyAfterCola)} onChange={() => {}} />
+                      </Field>
+                      <Field label="Award Letter — annual benefit after COLA">
+                        <TextInput value={money(calc.annualAfterCola)} onChange={() => {}} />
+                      </Field>
+                      {calc.eivOn && (
+                        <React.Fragment>
+                          <Field label="EIV — monthly amount before COLA">
+                            <TextInput value={money(num(b.eivAmount))} onChange={() => {}} />
+                          </Field>
+                          <Field label="EIV — monthly amount after COLA">
+                            <TextInput value={money(calc.eivMonthlyAfterCola)} onChange={() => {}} />
+                          </Field>
+                          <Field label="EIV — annual amount after COLA">
+                            <TextInput value={money(calc.eivAnnualAfterCola)} onChange={() => {}} />
+                          </Field>
+                        </React.Fragment>
+                      )}
+                    </div>
+                    {calc.eivOn && (
+                      <p className="hint" style={{ marginTop: 8 }}>
+                        The COLA % above is applied to both the Award Letter and EIV amounts.
+                      </p>
+                    )}
+
+                    {calc.monthsUntilCola !== null && (
+                      <div className="breakdown-box">
+                        <h3>Breakdown</h3>
+                        <div className="breakdown-row">
+                          <span className="desc">Award Letter: {money(num(b.monthlyBenefit))} × {calc.monthsBefore} month{calc.monthsBefore === 1 ? "" : "s"}:</span>
+                          <span className="amt">{money(calc.amountBefore)}</span>
+                        </div>
+                        <div className="breakdown-row">
+                          <span className="desc">Award Letter (COLA): {money(calc.monthlyAfterCola)} × {calc.monthsAfter} month{calc.monthsAfter === 1 ? "" : "s"}:</span>
+                          <span className="amt">{money(calc.amountAfter)}</span>
+                        </div>
+                        <div className="breakdown-row" style={{ fontWeight: 700 }}>
+                          <span className="desc">Award Letter Prorated Total (Before + After COLA):</span>
+                          <span className="amt">{money(calc.amountBefore + calc.amountAfter)}</span>
+                        </div>
+                        {calc.eivOn && (
+                          <React.Fragment>
+                            <div className="breakdown-row">
+                              <span className="desc">EIV: {money(num(b.eivAmount))} × {calc.monthsBefore} month{calc.monthsBefore === 1 ? "" : "s"}:</span>
+                              <span className="amt">{money(calc.eivAmountBefore)}</span>
+                            </div>
+                            <div className="breakdown-row">
+                              <span className="desc">EIV (COLA): {money(num(b.eivAmount) * (1 + num(b.colaPct) / 100))} × {calc.monthsAfter} month{calc.monthsAfter === 1 ? "" : "s"}:</span>
+                              <span className="amt">{money(calc.eivAmountAfter)}</span>
+                            </div>
+                            <div className="breakdown-row" style={{ fontWeight: 700 }}>
+                              <span className="desc">EIV Prorated Total (Before + After COLA):</span>
+                              <span className="amt">{money(calc.eivAmountBefore + calc.eivAmountAfter)}</span>
+                            </div>
+                          </React.Fragment>
+                        )}
+                      </div>
+                    )}
+                  </React.Fragment>
+                )}
+              </React.Fragment>
+            )}
+            </div>
+
+            {calc.eivOn ? (
+              <React.Fragment>
+                <TotalsBox
+                  label={`HUD-50059 Total Income (from EIV) — ${b.incomeType}${calc.colaFilled ? " (after COLA applied)" : ""}`}
+                  value={calc.eivAnnual}
+                />
+                <TotalsBox
+                  label={`LIHTC TIC Total Income (from Award/Benefit Letter) — ${b.incomeType}${calc.colaFilled ? " (after COLA applied)" : ""}`}
+                  value={calc.totalAnnual}
+                />
+              </React.Fragment>
+            ) : (
+              <TotalsBox
+                label={`Total annual amount — ${b.incomeType}${calc.colaFilled ? " (after COLA applied)" : ""}`}
+                value={calc.totalAnnual}
+              />
+            )}
+          </div>
+        );
+      })}
+
+      <div className="no-print">
+        <button className="btn" onClick={addBenefit} style={{ marginBottom: 16, width: "100%" }}>
+          + Add Another Benefit (SS / SSI / SSP)
+        </button>
+        <p className="hint" style={{ marginTop: -10, marginBottom: 16 }}>
+          Each benefit is calculated and shown separately — amounts are not added together, since
+          each may need to be reported on its own line.
+        </p>
+      </div>
+
+      <ActionBar
+        onPrint={() => { saveCurrentAsHistory("ss", "Social Security", s); printAs(buildPrintFilename("Social Security", s)); }}
+        onReset={() => setS(emptySS)}
+        onShare={() => buildShareUrl("ss", "Social Security", s)}
+      />
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------
+   2) Pay Stubs Calculator
+--------------------------------------------------------- */
+
+const makeStubs = (n) => Array.from({ length: n }, () => ({ gross: "", date: "" }));
+
+const emptyPS = {
+  propertyName: "", name: "", unit: "", certType: "", effectiveDate: "",
+  stubCount: 2,
+  stubs: makeStubs(9),
+  frequency: "Bi-Weekly",
+  ytdEnabled: "No",
+  startDate: jan1ThisYear(),
+  lastStubDate: "",
+  ytdGross: "",
+};
+
+function PayStubsCalc({ initialState }) {
+  const [s, setS] = useState(initialState || emptyPS);
+
+  const activeStubs = useMemo(() => {
+    const have = s.stubs || [];
+    const padded = have.length >= s.stubCount ? have : [...have, ...makeStubs(s.stubCount - have.length)];
+    return padded.slice(0, s.stubCount);
+  }, [s.stubs, s.stubCount]);
+
+  const updateStub = (i, field, value) => {
+    const have = s.stubs || [];
+    const stubs = have.length > i ? [...have] : [...have, ...makeStubs(i + 1 - have.length)];
+    stubs[i] = { ...stubs[i], [field]: value };
+    setS({ ...s, stubs });
+  };
+
+  const total = activeStubs.reduce((sum, st) => sum + num(st.gross), 0);
+  // Round the average to the nearest cent so neither the display nor the total-annual math
+  // downstream carries a long raw floating-point value. toFixed(10) first cleans up binary
+  // floating-point drift (e.g. 259.04 + 259.04 / 2 landing at 259.040000000000006 in JS),
+  // which a plain Math.ceil/Math.round on the raw division result could otherwise round up
+  // an entire extra cent.
+  const avgGross = activeStubs.length ? Math.round(Number((total / activeStubs.length).toFixed(10)) * 100) / 100 : 0;
+  const freqMult = PAY_BASIS_MULTIPLIER[s.frequency] || 0;
+  const totalAnnual = round2(avgGross * freqMult);
+
+  // Only warn if every filled-in stub date is stale — if at least one stub falls within the
+  // 120-day window, that's enough to satisfy the recency requirement.
+  const filledStubDates = activeStubs.filter((st) => st.date);
+  const allStale = filledStubDates.length > 0 && filledStubDates.every((st) => isStaleBefore(st.date, s.effectiveDate));
+
+  const ytdEnabled = s.ytdEnabled === "Yes";
+  const periodsWorked = useMemo(
+    () => calcPeriodsWorked(s.startDate, s.lastStubDate, freqMult),
+    [s.startDate, s.lastStubDate, freqMult]
+  );
+  const avgPeriodIncome = useMemo(
+    () => calcAvgPeriodIncome(s.ytdGross, periodsWorked),
+    [s.ytdGross, periodsWorked]
+  );
+  const ytdAnnual = useMemo(
+    () => calcYtdAnnual(s.ytdGross, periodsWorked, freqMult),
+    [s.ytdGross, periodsWorked, freqMult]
+  );
+  // Regular pay-stub calc wins ties; YTD only takes over when it's strictly higher.
+  const useRegularForBoth = !ytdEnabled || ytdAnnual === null || totalAnnual >= ytdAnnual;
+
+  return (
+    <div>
+      <HeaderFields state={s} setState={setS} />
+
+      <div className="card" data-tour="income-fields">
+        <h2>Pay Stub Entries</h2>
+        <div className="grid" style={{ marginBottom: 14 }}>
+          <Field label="How Many Pay Stubs?">
+            <Select
+              value={String(s.stubCount)}
+              onChange={(v) => setS({ ...s, stubCount: parseInt(v, 10) })}
+              options={[
+                { value: "2", label: "2 (HOTMA)" },
+                { value: "4", label: "4" },
+                { value: "6", label: "6" },
+                { value: "9", label: "9 (Rhode Island)" },
+              ]}
+            />
+            <span className="subhint">2 Pay Stubs (HOTMA) is the current default minimum</span>
+          </Field>
+        </div>
+        <p className="hint">List the gross amount and pay date from the most recent pay periods.</p>
+
+        <div className="table-scroll">
+          <table className="stub-table">
+            <thead>
+              <tr><th style={{ width: "8%" }}>#</th><th>Gross Pay</th><th>Pay Date</th></tr>
+            </thead>
+            <tbody>
+              {activeStubs.map((st, i) => (
+                <tr key={i}>
+                  <td>Stub {i + 1}</td>
+                  <td>
+                    <input type="number" step="0.01" placeholder="0.00" value={st.gross}
+                      onChange={(e) => updateStub(i, "gross", e.target.value)} />
+                  </td>
+                  <td>
+                    <input type="date" value={st.date}
+                      onChange={(e) => updateStub(i, "date", e.target.value)} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {allStale && (
+          <Warning>
+            None of the pay stub dates are within 120 days of the effective date.
+            HUD recommends using documents dated within 120 days of the effective date for income verification.
+          </Warning>
+        )}
+      </div>
+
+      <div className="card">
+        <h2>Pay Stub Details</h2>
+        <div className="grid">
+          <Field label="Average Gross Pay">
+            <TextInput value={money(avgGross)} onChange={() => {}} />
+          </Field>
+          <Field label="Pay Frequency">
+            <Select
+              value={s.frequency}
+              onChange={(v) => setS({ ...s, frequency: v })}
+              options={["Weekly", "Bi-Weekly", "Semi-Monthly", "Monthly"]}
+            />
+            <span className="subhint">
+              Weekly (52) · Bi-Weekly (26) · Semi-Monthly (24) · Monthly (12)
+            </span>
+          </Field>
+        </div>
+        <TotalsBox label="Total annual employment income" value={totalAnnual} />
+      </div>
+
+      <div className={"card" + (ytdEnabled ? "" : " ytd-no-print")}>
+        <h2>YTD Income Calculation</h2>
+        <div className="grid">
+          <Field label="Calculate YTD Income?">
+            <div className="radio-row">
+              <label><input type="radio" name="ytdEnabled" checked={s.ytdEnabled === "Yes"}
+                onChange={() => setS({ ...s, ytdEnabled: "Yes" })} /> Yes</label>
+              <label><input type="radio" name="ytdEnabled" checked={s.ytdEnabled === "No"}
+                onChange={() => setS({ ...s, ytdEnabled: "No" })} /> No</label>
+            </div>
+          </Field>
+        </div>
+
+        {ytdEnabled && (
+          <React.Fragment>
+            <div className="grid" style={{ marginTop: 14 }}>
+              <Field label="Date of Employment">
+                <TextInput type="date" value={s.startDate} onChange={(v) => setS({ ...s, startDate: v })} />
+              </Field>
+              <Field label="Date of Last Pay Stub">
+                <TextInput type="date" value={s.lastStubDate} onChange={(v) => setS({ ...s, lastStubDate: v })} />
+              </Field>
+              <Field label="YTD Gross Income" hint="From last check stub obtained">
+                <TextInput type="number" step="0.01" value={s.ytdGross} onChange={(v) => setS({ ...s, ytdGross: v })} placeholder="0.00" />
+              </Field>
+              <Field label="Pay Frequency" hint="Uses the Pay Frequency selected above">
+                <TextInput value={s.frequency} onChange={() => {}} />
+              </Field>
+            </div>
+
+            <div className="grid" style={{ marginTop: 14 }}>
+              <Field label="Pay Periods Worked">
+                <TextInput value={periodsWorked !== null ? String(periodsWorked) : "—"} onChange={() => {}} />
+              </Field>
+              <Field label="Avg Period Income">
+                <TextInput value={avgPeriodIncome !== null ? money(avgPeriodIncome) : "—"} onChange={() => {}} />
+              </Field>
+              <Field label="Gross YTD Income (Annualized)">
+                <TextInput value={ytdAnnual !== null ? money(ytdAnnual) : "—"} onChange={() => {}} />
+              </Field>
+            </div>
+
+            {useRegularForBoth ? (
+              <React.Fragment>
+                <p className="hint" style={{ marginTop: 14 }}>
+                  The regular pay stub calculation is equal to or higher than the YTD-based calculation,
+                  so it is used for both HUD-50059 and LIHTC TIC reporting.
+                </p>
+                <TotalsBox label="Total annual employment income (HUD-50059 & TIC)" value={totalAnnual} />
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <p className="hint" style={{ marginTop: 14 }}>
+                  The YTD-based calculation is higher than the regular pay stub calculation, so each
+                  reporting form reflects a different figure.
+                </p>
+                <TotalsBox label="HUD-50059 Total Income (from pay stubs)" value={totalAnnual} />
+                <TotalsBox label="LIHTC TIC Total Income (from YTD)" value={ytdAnnual} />
+              </React.Fragment>
+            )}
+          </React.Fragment>
+        )}
+      </div>
+
+      <ActionBar
+        onPrint={() => { saveCurrentAsHistory("ps", "Pay Stubs", s); printAs(buildPrintFilename("Pay Stubs", s)); }}
+        onReset={() => setS(emptyPS)}
+        onShare={() => buildShareUrl("ps", "Pay Stubs", s)}
+      />
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------
+   3) Employment Verification Calculator
+--------------------------------------------------------- */
+
+const emptyEV = {
+  propertyName: "", name: "", unit: "", certType: "", effectiveDate: "",
+  employed: "Yes", dateFirstEmployed: "",
+  wage: "", payBasis: "Yearly", hoursPerWeek: "",
+
+  // Overtime & Shift Differential — collapsible section
+  otShiftEnabled: "No",
+  otRate: "", otHours: "", shiftRate: "", shiftHours: "",
+
+  // Commissions, Tips, Bonuses — collapsible section
+  commEnabled: "No",
+  commAmount: "", commBasis: "Yearly",
+  tipsAmount: "", tipsBasis: "Yearly",
+  bonusAmount: "", bonusBasis: "Yearly",
+
+  // Anticipated Changes & Other Info — collapsible section
+  changeEnabled: "No",
+  changeType: "Amount", // "Amount" (new $ rate) or "Percentage" (% increase over current wage)
+  changeAmount: "", changeBasis: "Yearly", changePct: "",
+  changeDate: "", layoffPeriods: "",
+
+  // Optional: also increase OT/Shift Differential rates as part of the anticipated change
+  changeOtEnabled: "No",
+  changeOtMode: "Auto", // "Auto" (same % as the base pay change) or "Manual" (type new rates)
+  changeOtRate: "", changeShiftRate: "",
+
+  // YTD Income Calculation — same pattern as the Pay Stubs calculator
+  ytdEnabled: "No",
+  startDate: jan1ThisYear(),
+  lastStubDate: "",
+  ytdGross: "",
+  ytdFrequency: "Bi-Weekly",
+  ytdPeriodsWorked: "",
+};
+
+const CHANGE_TYPE_OPTIONS = [
+  { value: "Amount", label: "New $ Rate" },
+  { value: "Percentage", label: "% Increase" },
+];
+
+const CHANGE_OT_MODE_OPTIONS = [
+  { value: "Auto", label: "Auto — same % as base pay change" },
+  { value: "Manual", label: "Manual — enter new rates" },
+];
+
+function EmploymentVerificationCalc({ initialState }) {
+  const [s, setS] = useState(initialState || emptyEV);
+
+  const otShiftOn = s.otShiftEnabled === "Yes";
+  const commOn = s.commEnabled === "Yes";
+  const changeOn = s.changeEnabled === "Yes";
+  const changeOtOn = changeOn && otShiftOn && s.changeOtEnabled === "Yes";
+
+  const payBasisOptions = ["Hourly", "Weekly", "Bi-Weekly", "Semi-Monthly", "Monthly", "Yearly"];
+
+  const baseAnnual = useMemo(
+    () => annualize(s.wage, s.payBasis, s.hoursPerWeek),
+    [s.wage, s.payBasis, s.hoursPerWeek]
+  );
+  const otAnnual = useMemo(
+    () => (otShiftOn ? round2(num(s.otRate) * num(s.otHours) * 52) : 0),
+    [otShiftOn, s.otRate, s.otHours]
+  );
+  const shiftAnnual = useMemo(
+    () => (otShiftOn ? round2(num(s.shiftRate) * num(s.shiftHours) * 52) : 0),
+    [otShiftOn, s.shiftRate, s.shiftHours]
+  );
+  const commissionAnnual = useMemo(
+    () => (commOn ? annualize(s.commAmount, s.commBasis, s.hoursPerWeek) : 0),
+    [commOn, s.commAmount, s.commBasis, s.hoursPerWeek]
+  );
+  const tipsAnnual = useMemo(
+    () => (commOn ? annualize(s.tipsAmount, s.tipsBasis, s.hoursPerWeek) : 0),
+    [commOn, s.tipsAmount, s.tipsBasis, s.hoursPerWeek]
+  );
+  const bonusAnnual = useMemo(
+    () => (commOn ? annualize(s.bonusAmount, s.bonusBasis, s.hoursPerWeek) : 0),
+    [commOn, s.bonusAmount, s.bonusBasis, s.hoursPerWeek]
+  );
+  const commAnnual = round2(commissionAnnual + tipsAnnual + bonusAnnual);
+
+  // Current ("old") totals, before any anticipated change.
+  const flatTotal = round2(baseAnnual + otAnnual + shiftAnnual + commAnnual);
+
+  // Number of pay periods per year implied by the wage's Pay Basis (Hourly has no inherent
+  // frequency of its own, so it defaults to a weekly-equivalent 52 periods/year).
+  const payFreqNum = PAY_BASIS_MULTIPLIER[s.payBasis] || 52;
+  const oldPerPeriodTotal = round2(flatTotal / payFreqNum);
+
+  // New base wage after the anticipated change, either a flat new $ rate or a % increase
+  // over the current wage.
+  const newBaseAnnual = useMemo(() => {
+    if (!changeOn) return baseAnnual;
+    if (s.changeType === "Percentage") {
+      if (s.changePct === "") return baseAnnual;
+      return round2(baseAnnual * (1 + num(s.changePct) / 100));
+    }
+    if (s.changeAmount === "") return baseAnnual;
+    return annualize(s.changeAmount, s.changeBasis, s.hoursPerWeek);
+  }, [changeOn, s.changeType, s.changePct, s.changeAmount, s.changeBasis, s.hoursPerWeek, baseAnnual]);
+
+  // The % the base wage effectively moved by, whichever mode was used to define it —
+  // used to auto-increase OT/Shift rates by "the same percentage" when that option is chosen.
+  const impliedPct = useMemo(() => {
+    if (s.changeType === "Percentage") return num(s.changePct);
+    if (baseAnnual > 0) return ((newBaseAnnual / baseAnnual) - 1) * 100;
+    return 0;
+  }, [s.changeType, s.changePct, newBaseAnnual, baseAnnual]);
+
+  const newOtRateVal = useMemo(() => {
+    if (!changeOtOn) return num(s.otRate);
+    if (s.changeOtMode === "Manual") return num(s.changeOtRate);
+    return round2(num(s.otRate) * (1 + impliedPct / 100));
+  }, [changeOtOn, s.changeOtMode, s.changeOtRate, s.otRate, impliedPct]);
+
+  const newShiftRateVal = useMemo(() => {
+    if (!changeOtOn) return num(s.shiftRate);
+    if (s.changeOtMode === "Manual") return num(s.changeShiftRate);
+    return round2(num(s.shiftRate) * (1 + impliedPct / 100));
+  }, [changeOtOn, s.changeOtMode, s.changeShiftRate, s.shiftRate, impliedPct]);
+
+  const newOtAnnual = changeOtOn ? round2(newOtRateVal * num(s.otHours) * 52) : otAnnual;
+  const newShiftAnnual = changeOtOn ? round2(newShiftRateVal * num(s.shiftHours) * 52) : shiftAnnual;
+  const newFlatTotal = round2(newBaseAnnual + newOtAnnual + newShiftAnnual + commAnnual);
+  const newPerPeriodTotal = round2(newFlatTotal / payFreqNum);
+
+  // Blended annualization: how many of the year's pay periods (from the recert Effective Date,
+  // using the wage's Pay Basis frequency) fall before vs. after the anticipated change's date.
+  const periodsUntilChange = useMemo(() => {
+    if (!changeOn || !s.effectiveDate || !s.changeDate) return null;
+    const diffDays = daysBetween(s.effectiveDate, s.changeDate);
+    if (diffDays === null) return null;
+    const periodLengthDays = 365 / payFreqNum;
+    const periods = Math.round(diffDays / periodLengthDays);
+    return Math.min(payFreqNum, Math.max(0, periods));
+  }, [changeOn, s.effectiveDate, s.changeDate, payFreqNum]);
+
+  const periodsBefore = periodsUntilChange !== null ? periodsUntilChange : 0;
+  const periodsAfter = periodsUntilChange !== null ? payFreqNum - periodsUntilChange : 0;
+  const amountBefore = round2(oldPerPeriodTotal * periodsBefore);
+  const amountAfter = round2(newPerPeriodTotal * periodsAfter);
+  const blendedTotal = round2(amountBefore + amountAfter);
+
+  const totalAnnual = periodsUntilChange !== null ? blendedTotal : flatTotal;
+
+  const ytdEnabled = s.ytdEnabled === "Yes";
+  const ytdFreqMult = PAY_BASIS_MULTIPLIER[s.ytdFrequency] || 0;
+  const autoPeriodsWorked = useMemo(
+    () => calcPeriodsWorked(s.startDate, s.lastStubDate, ytdFreqMult),
+    [s.startDate, s.lastStubDate, ytdFreqMult]
+  );
+  // "Pay Periods Worked" is auto-calculated from the dates above by default, but can be typed
+  // over manually — the manual value wins whenever it's been filled in.
+  const periodsWorked = s.ytdPeriodsWorked !== "" ? num(s.ytdPeriodsWorked) : autoPeriodsWorked;
+  const avgPeriodIncome = useMemo(
+    () => calcAvgPeriodIncome(s.ytdGross, periodsWorked),
+    [s.ytdGross, periodsWorked]
+  );
+  const ytdAnnual = useMemo(
+    () => calcYtdAnnual(s.ytdGross, periodsWorked, ytdFreqMult),
+    [s.ytdGross, periodsWorked, ytdFreqMult]
+  );
+
+  return (
+    <div>
+      <HeaderFields state={s} setState={setS} />
+
+      <div className="card" data-tour="income-fields">
+        <h2>Employment Status</h2>
+        <div className="grid">
+          <Field label="Presently Employed?">
+            <div className="radio-row">
+              <label><input type="radio" name="employed" checked={s.employed === "Yes"}
+                onChange={() => setS({ ...s, employed: "Yes" })} /> Yes</label>
+              <label><input type="radio" name="employed" checked={s.employed === "No"}
+                onChange={() => setS({ ...s, employed: "No" })} /> No</label>
+            </div>
+          </Field>
+          <Field label="Date First Employed">
+            <TextInput type="date" value={s.dateFirstEmployed} onChange={(v) => setS({ ...s, dateFirstEmployed: v })} />
+          </Field>
+        </div>
+      </div>
+
+      <div className="card">
+        <h2>Base Wages / Salary</h2>
+        <div className="grid">
+          <Field label="Current Wages/Salary">
+            <TextInput type="number" step="0.01" value={s.wage} onChange={(v) => setS({ ...s, wage: v })} placeholder="0.00" />
+          </Field>
+          <Field label="Pay Basis">
+            <Select value={s.payBasis} onChange={(v) => setS({ ...s, payBasis: v })} options={payBasisOptions} />
+          </Field>
+          <Field label="Average # regular hours per week" hint="Used when Pay Basis is Hourly">
+            <TextInput type="number" step="0.1" value={s.hoursPerWeek} onChange={(v) => setS({ ...s, hoursPerWeek: v })} placeholder="0" />
+          </Field>
+        </div>
+      </div>
+
+      <div className={"card" + (ytdEnabled ? "" : " ytd-no-print")}>
+        <h2>YTD Income Calculation</h2>
+        <div className="grid">
+          <Field label="Calculate YTD Income?">
+            <div className="radio-row">
+              <label><input type="radio" name="ytdEnabled" checked={s.ytdEnabled === "Yes"}
+                onChange={() => setS({ ...s, ytdEnabled: "Yes" })} /> Yes</label>
+              <label><input type="radio" name="ytdEnabled" checked={s.ytdEnabled === "No"}
+                onChange={() => setS({ ...s, ytdEnabled: "No" })} /> No</label>
+            </div>
+          </Field>
+        </div>
+
+        {ytdEnabled && (
+          <React.Fragment>
+            <div className="grid" style={{ marginTop: 14 }}>
+              <Field label="Date of Employment">
+                <TextInput
+                  type="date"
+                  value={s.startDate}
+                  onChange={(v) => setS({ ...s, startDate: v, ytdPeriodsWorked: "" })}
+                />
+              </Field>
+              <Field label="Last Pay Period Date">
+                <TextInput
+                  type="date"
+                  value={s.lastStubDate}
+                  onChange={(v) => setS({ ...s, lastStubDate: v, ytdPeriodsWorked: "" })}
+                />
+              </Field>
+              <Field label="YTD Gross Income" hint="From last check stub obtained">
+                <TextInput type="number" step="0.01" value={s.ytdGross} onChange={(v) => setS({ ...s, ytdGross: v })} placeholder="0.00" />
+              </Field>
+              <Field label="Pay Frequency">
+                <Select
+                  value={s.ytdFrequency}
+                  onChange={(v) => setS({ ...s, ytdFrequency: v })}
+                  options={["Weekly", "Bi-Weekly", "Semi-Monthly", "Monthly"]}
+                />
+                <span className="subhint">
+                  Weekly (52) · Bi-Weekly (26) · Semi-Monthly (24) · Monthly (12)
+                </span>
+              </Field>
+            </div>
+
+            <div className="grid" style={{ marginTop: 14 }}>
+              <Field
+                label="Pay Periods Worked"
+                hint={
+                  autoPeriodsWorked !== null
+                    ? `Auto-calculated from dates above: ${autoPeriodsWorked}. Edit to override — changing the dates resets it back to auto.`
+                    : "Auto-calculates from the dates above, or type your own."
+                }
+              >
+                <TextInput
+                  type="number"
+                  step="1"
+                  value={s.ytdPeriodsWorked}
+                  onChange={(v) => setS({ ...s, ytdPeriodsWorked: v })}
+                  placeholder={autoPeriodsWorked !== null ? String(autoPeriodsWorked) : "0"}
+                />
+              </Field>
+              <Field label="Avg Period Income">
+                <TextInput value={avgPeriodIncome !== null ? money(avgPeriodIncome) : "—"} onChange={() => {}} />
+              </Field>
+              <Field label="Gross YTD Income (Annualized)">
+                <TextInput value={ytdAnnual !== null ? money(ytdAnnual) : "—"} onChange={() => {}} />
+              </Field>
+            </div>
+
+            <TotalsBox
+              label="Total annual employment income (YTD)"
+              value={ytdAnnual}
+            />
+          </React.Fragment>
+        )}
+      </div>
+
+      <div className={"card" + (otShiftOn ? "" : " section-off-no-print")}>
+        <h2>Overtime &amp; Shift Differential</h2>
+        <YesNoToggle
+          label="Does the applicant receive Overtime or Shift Differential pay?"
+          value={s.otShiftEnabled}
+          onChange={(v) => setS({ ...s, otShiftEnabled: v })}
+        />
+        {otShiftOn && (
+          <div className="grid">
+            <Field label="Overtime Rate ($ per hour)">
+              <TextInput type="number" step="0.01" value={s.otRate} onChange={(v) => setS({ ...s, otRate: v })} placeholder="0.00" />
+            </Field>
+            <Field label="Avg # of overtime hours per week">
+              <TextInput type="number" step="0.1" value={s.otHours} onChange={(v) => setS({ ...s, otHours: v })} />
+            </Field>
+            <Field label="Shift Differential Rate ($ per hour)">
+              <TextInput type="number" step="0.01" value={s.shiftRate} onChange={(v) => setS({ ...s, shiftRate: v })} placeholder="0.00" />
+            </Field>
+            <Field label="Avg # of shift diff. hours per week">
+              <TextInput type="number" step="0.1" value={s.shiftHours} onChange={(v) => setS({ ...s, shiftHours: v })} />
+            </Field>
+          </div>
+        )}
+      </div>
+
+      <div className={"card" + (commOn ? "" : " section-off-no-print")}>
+        <h2>Commissions, Tips, Bonuses</h2>
+        <YesNoToggle
+          label="Does the applicant receive Commissions, Tips, or Bonuses?"
+          value={s.commEnabled}
+          onChange={(v) => setS({ ...s, commEnabled: v })}
+        />
+        {commOn && (
+          <div className="grid">
+            <Field label="Commission Amount">
+              <TextInput type="number" step="0.01" value={s.commAmount} onChange={(v) => setS({ ...s, commAmount: v })} placeholder="0.00" />
+            </Field>
+            <Field label="Commission Pay Basis">
+              <Select value={s.commBasis} onChange={(v) => setS({ ...s, commBasis: v })} options={payBasisOptions} />
+            </Field>
+            <Field label="Tips Amount">
+              <TextInput type="number" step="0.01" value={s.tipsAmount} onChange={(v) => setS({ ...s, tipsAmount: v })} placeholder="0.00" />
+            </Field>
+            <Field label="Tips Pay Basis">
+              <Select value={s.tipsBasis} onChange={(v) => setS({ ...s, tipsBasis: v })} options={payBasisOptions} />
+            </Field>
+            <Field label="Bonus Amount">
+              <TextInput type="number" step="0.01" value={s.bonusAmount} onChange={(v) => setS({ ...s, bonusAmount: v })} placeholder="0.00" />
+            </Field>
+            <Field label="Bonus Pay Basis">
+              <Select value={s.bonusBasis} onChange={(v) => setS({ ...s, bonusBasis: v })} options={payBasisOptions} />
+            </Field>
+          </div>
+        )}
+      </div>
+
+      <div className="card">
+        <h2>Anticipated Changes &amp; Other Info</h2>
+        <YesNoToggle
+          label="Is there an anticipated pay change in the next 12 months?"
+          value={s.changeEnabled}
+          onChange={(v) => setS({ ...s, changeEnabled: v })}
+        />
+        {changeOn && (
+          <React.Fragment>
+            <div className="grid">
+              <Field label="Change is defined as">
+                <Select value={s.changeType} onChange={(v) => setS({ ...s, changeType: v })} options={CHANGE_TYPE_OPTIONS} />
+              </Field>
+              {s.changeType === "Percentage" ? (
+                <Field label="Percentage increase (%)" hint="Applied to the current base wage above">
+                  <TextInput type="number" step="0.01" value={s.changePct} onChange={(v) => setS({ ...s, changePct: v })} placeholder="0.00" />
+                </Field>
+              ) : (
+                <React.Fragment>
+                  <Field label="New Wage/Salary Rate">
+                    <TextInput type="number" step="0.01" value={s.changeAmount} onChange={(v) => setS({ ...s, changeAmount: v })} placeholder="0.00" />
+                  </Field>
+                  <Field label="Pay Basis for Change">
+                    <Select value={s.changeBasis} onChange={(v) => setS({ ...s, changeBasis: v })} options={payBasisOptions} />
+                  </Field>
+                </React.Fragment>
+              )}
+              <Field
+                label="Effective Date of Change"
+                hint={`Split is calculated in ${s.payBasis} pay periods (${payFreqNum}/year) based on the Base Wages Pay Basis`}
+              >
+                <TextInput type="date" value={s.changeDate} onChange={(v) => setS({ ...s, changeDate: v })} />
+              </Field>
+              <Field label="If seasonal/sporadic, indicate layoff period(s)">
+                <TextInput value={s.layoffPeriods} onChange={(v) => setS({ ...s, layoffPeriods: v })} placeholder="e.g. Dec–Feb" />
+              </Field>
+            </div>
+
+            {otShiftOn && (
+              <div style={{ marginTop: 14 }}>
+                <YesNoToggle
+                  label="Also increase Overtime / Shift Differential rates as part of this change?"
+                  value={s.changeOtEnabled}
+                  onChange={(v) => setS({ ...s, changeOtEnabled: v })}
+                />
+                {changeOtOn && (
+                  <div className="grid">
+                    <Field label="How should OT/Shift rates increase?">
+                      <Select value={s.changeOtMode} onChange={(v) => setS({ ...s, changeOtMode: v })} options={CHANGE_OT_MODE_OPTIONS} />
+                    </Field>
+                    {s.changeOtMode === "Manual" ? (
+                      <React.Fragment>
+                        <Field label="New Overtime Rate ($ per hour)">
+                          <TextInput type="number" step="0.01" value={s.changeOtRate} onChange={(v) => setS({ ...s, changeOtRate: v })} placeholder="0.00" />
+                        </Field>
+                        <Field label="New Shift Differential Rate ($ per hour)">
+                          <TextInput type="number" step="0.01" value={s.changeShiftRate} onChange={(v) => setS({ ...s, changeShiftRate: v })} placeholder="0.00" />
+                        </Field>
+                      </React.Fragment>
+                    ) : (
+                      <React.Fragment>
+                        <Field label="New Overtime Rate ($ per hour)" hint={`Auto: current rate + ${impliedPct.toFixed(2)}%`}>
+                          <TextInput value={newOtRateVal.toFixed(2)} onChange={() => {}} />
+                        </Field>
+                        <Field label="New Shift Differential Rate ($ per hour)" hint={`Auto: current rate + ${impliedPct.toFixed(2)}%`}>
+                          <TextInput value={newShiftRateVal.toFixed(2)} onChange={() => {}} />
+                        </Field>
+                      </React.Fragment>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </React.Fragment>
+        )}
+
+        <div className="breakdown-box" style={{ marginTop: 16 }}>
+          <h3>Income Breakdown</h3>
+          <div className="breakdown-row">
+            <span className="desc">Base Wages/Salary (annualized):</span>
+            <span className="amt">{money(baseAnnual)}</span>
+          </div>
+          {otShiftOn && (
+            <React.Fragment>
+              <div className="breakdown-row">
+                <span className="desc">Overtime (annualized):</span>
+                <span className="amt">{money(otAnnual)}</span>
+              </div>
+              <div className="breakdown-row">
+                <span className="desc">Shift Differential (annualized):</span>
+                <span className="amt">{money(shiftAnnual)}</span>
+              </div>
+            </React.Fragment>
+          )}
+          {changeOtOn && (
+            <React.Fragment>
+              <div className="breakdown-row">
+                <span className="desc">
+                  New Overtime rate after change: {money(newOtRateVal)}/hr (annualized):
+                </span>
+                <span className="amt">{money(newOtAnnual)}</span>
+              </div>
+              <div className="breakdown-row">
+                <span className="desc">
+                  New Shift Differential rate after change: {money(newShiftRateVal)}/hr (annualized):
+                </span>
+                <span className="amt">{money(newShiftAnnual)}</span>
+              </div>
+            </React.Fragment>
+          )}
+          {commOn && (
+            <React.Fragment>
+              <div className="breakdown-row">
+                <span className="desc">Commission (annualized):</span>
+                <span className="amt">{money(commissionAnnual)}</span>
+              </div>
+              <div className="breakdown-row">
+                <span className="desc">Tips (annualized):</span>
+                <span className="amt">{money(tipsAnnual)}</span>
+              </div>
+              <div className="breakdown-row">
+                <span className="desc">Bonus (annualized):</span>
+                <span className="amt">{money(bonusAnnual)}</span>
+              </div>
+            </React.Fragment>
+          )}
+          {periodsUntilChange !== null ? (
+            <React.Fragment>
+              <div className="breakdown-row">
+                <span className="desc">
+                  Old income: {money(oldPerPeriodTotal)}/period × {periodsBefore} pay period{periodsBefore === 1 ? "" : "s"} (through change date):
+                </span>
+                <span className="amt">{money(amountBefore)}</span>
+              </div>
+              <div className="breakdown-row">
+                <span className="desc">
+                  New income: {money(newPerPeriodTotal)}/period × {periodsAfter} pay period{periodsAfter === 1 ? "" : "s"} (after change date):
+                </span>
+                <span className="amt">{money(amountAfter)}</span>
+              </div>
+            </React.Fragment>
+          ) : (
+            <div className="breakdown-row">
+              <span className="desc">Total (annualized):</span>
+              <span className="amt">{money(flatTotal)}</span>
+            </div>
+          )}
+        </div>
+
+        <TotalsBox label="Total annual employment income" value={totalAnnual} />
+      </div>
+
+      <ActionBar
+        onPrint={() => { saveCurrentAsHistory("ev", "Employment Verification", s); printAs(buildPrintFilename("Employment Verification", s)); }}
+        onReset={() => setS(emptyEV)}
+        onShare={() => buildShareUrl("ev", "Employment Verification", s)}
+      />
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------
+   App shell
+--------------------------------------------------------- */
+
+const TABS = [
+  { key: "ss", label: "Social Security", Component: SocialSecurityCalc },
+  { key: "ps", label: "Pay Stubs", Component: PayStubsCalc },
+  { key: "ev", label: "Employment Verification", Component: EmploymentVerificationCalc },
+];
+
+function App() {
+  const [active, setActive] = useState(() => {
+    const shared = parseShareHash();
+    return shared ? shared.tabKey : "ss";
+  });
+  const [pendingLoad, setPendingLoad] = useState(() => {
+    const shared = parseShareHash();
+    return shared ? shared.data : null;
+  });
+  const [loadKey, setLoadKey] = useState(0);
+  const [showHistory, setShowHistory] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(() => !hasSeenOnboarding());
+  const ActiveComponent = TABS.find((t) => t.key === active).Component;
+
+  useEffect(() => {
+    // Once a shared link has been loaded into the form, drop it from the address bar so a
+    // later refresh doesn't wipe out whatever the person has since typed.
+    if (parseShareHash()) {
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+  }, []);
+
+  const handleTabClick = (key) => {
+    setActive(key);
+    setPendingLoad(null);
+    setShowHistory(false);
+  };
+
+  const handleLoadEntry = (entry) => {
+    setActive(entry.tabKey);
+    setPendingLoad(entry.data);
+    setLoadKey((k) => k + 1);
+    setShowHistory(false);
+  };
+
+  const handleCloseOnboarding = () => {
+    markOnboardingSeen();
+    setShowOnboarding(false);
+  };
+
+  return (
+    <React.Fragment>
+      {showOnboarding && <GuidedTour onClose={handleCloseOnboarding} />}
+      <header className="site-header">
+        <div className="header-top">
+          <Logo />
+          <span className="brand-divider" />
+          <h1 style={{ margin: 0 }}>Income Calculation Tool</h1>
+          <button
+            className="btn help-toggle-btn"
+            data-tour="help-btn"
+            style={{ marginLeft: "auto" }}
+            onClick={() => { setShowHistory(false); setShowOnboarding(true); }}
+          >
+            How to Use
+          </button>
+          <button
+            className="btn history-toggle-btn"
+            data-tour="saved-work"
+            onClick={() => setShowHistory((v) => !v)}
+          >
+            {showHistory ? "Close Saved Work" : "My Saved Work"}
+          </button>
+        </div>
+        <p className="header-subtitle">Income calculation tool for Social Security, Pay Stubs &amp; Employment Verification.</p>
+        <p className="print-only income-type-label">
+          Income Type: {TABS.find((t) => t.key === active).label}
+        </p>
+      </header>
+      <div className="container">
+        <div className="tabs" data-tour="tabs">
+          {TABS.map((t) => (
+            <button
+              key={t.key}
+              className={"tab-btn" + (active === t.key && !showHistory ? " active" : "")}
+              onClick={() => handleTabClick(t.key)}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        {showHistory ? (
+          <HistoryPanel onLoad={handleLoadEntry} onClose={() => setShowHistory(false)} />
+        ) : (
+          // key forces remount so each calculator keeps independent state per tab / per loaded entry
+          <ActiveComponent key={active + "_" + loadKey} initialState={pendingLoad} />
+        )}
+      </div>
+      <footer className="site-footer">
+        <p style={{ margin: "0 0 6px 0" }}>
+          Calculations follow standard HUD/LIHTC annualization conventions and are provided for
+          informational purposes only. Always confirm figures against your property's compliance
+          manual and current HUD guidance.
+        </p>
+        <p style={{ margin: 0 }}>Developed by Amr Hegab</p>
+      </footer>
+    </React.Fragment>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
